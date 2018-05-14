@@ -1127,48 +1127,42 @@ bool OurReader::readValue() {
     break;
   case tokenTrue:
     {
-    Value v(true);
-    currentValue().swapPayload(v);
+    Value(true).swapPayload(currentValue());
     currentValue().setOffsetStart(token.start_ - begin_);
     currentValue().setOffsetLimit(token.end_ - begin_);
     }
     break;
   case tokenFalse:
     {
-    Value v(false);
-    currentValue().swapPayload(v);
+    Value(false).swapPayload(currentValue());
     currentValue().setOffsetStart(token.start_ - begin_);
     currentValue().setOffsetLimit(token.end_ - begin_);
     }
     break;
   case tokenNull:
     {
-    Value v;
-    currentValue().swapPayload(v);
+    Value().swapPayload(currentValue());
     currentValue().setOffsetStart(token.start_ - begin_);
     currentValue().setOffsetLimit(token.end_ - begin_);
     }
     break;
   case tokenNaN:
     {
-    Value v(std::numeric_limits<double>::quiet_NaN());
-    currentValue().swapPayload(v);
+    Value(std::numeric_limits<double>::quiet_NaN()).swapPayload(currentValue());
     currentValue().setOffsetStart(token.start_ - begin_);
     currentValue().setOffsetLimit(token.end_ - begin_);
     }
     break;
   case tokenPosInf:
     {
-    Value v(std::numeric_limits<double>::infinity());
-    currentValue().swapPayload(v);
+    Value(std::numeric_limits<double>::infinity()).swapPayload(currentValue());
     currentValue().setOffsetStart(token.start_ - begin_);
     currentValue().setOffsetLimit(token.end_ - begin_);
     }
     break;
   case tokenNegInf:
     {
-    Value v(-std::numeric_limits<double>::infinity());
-    currentValue().swapPayload(v);
+    Value(-std::numeric_limits<double>::infinity()).swapPayload(currentValue());
     currentValue().setOffsetStart(token.start_ - begin_);
     currentValue().setOffsetLimit(token.end_ - begin_);
     }
@@ -1180,8 +1174,7 @@ bool OurReader::readValue() {
       // "Un-read" the current token and mark the current value as a null
       // token.
       current_--;
-      Value v;
-      currentValue().swapPayload(v);
+      Value().swapPayload(currentValue());
       currentValue().setOffsetStart(current_ - begin_ - 1);
       currentValue().setOffsetLimit(current_ - begin_);
       break;
@@ -1464,8 +1457,7 @@ bool OurReader::readStringSingleQuote() {
 bool OurReader::readObject(Token& tokenStart) {
   Token tokenName;
   JSONCPP_STRING name;
-  Value init(objectValue);
-  currentValue().swapPayload(init);
+  Value(objectValue).swapPayload(currentValue());
   currentValue().setOffsetStart(tokenStart.start_ - begin_);
   while (readToken(tokenName)) {
     bool initialTokenOk = true;
@@ -1524,8 +1516,7 @@ bool OurReader::readObject(Token& tokenStart) {
 }
 
 bool OurReader::readArray(Token& tokenStart) {
-  Value init(arrayValue);
-  currentValue().swapPayload(init);
+  Value(arrayValue).swapPayload(currentValue());
   currentValue().setOffsetStart(tokenStart.start_ - begin_);
   skipSpaces();
   if (current_ != end_ && *current_ == ']') // empty array
