@@ -119,6 +119,7 @@ def amalgamate_source(source_top_dir=None,
     lib_json = "src/lib_json"
     source.add_file(os.path.join(lib_json, "json_tool.h"))
     source.add_file(os.path.join(lib_json, "json_reader.cpp"))
+    source.add_file(os.path.join(lib_json, "json_char_reader.cpp"))
     source.add_file(os.path.join(lib_json, "json_valueiterator.inl"))
     source.add_file(os.path.join(lib_json, "json_value.cpp"))
     source.add_file(os.path.join(lib_json, "json_writer.cpp"))

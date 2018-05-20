@@ -23,7 +23,7 @@
  */
 
 namespace Json {
-static char getDecimalPoint() {
+static inline char getDecimalPoint() {
 #ifdef JSONCPP_NO_LOCALE_SUPPORT
   return '\0';
 #else
