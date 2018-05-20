@@ -54,7 +54,8 @@ SOURCE_GROUP( "Public API" FILES ${PUBLIC_HEADERS} )
 
 SET(jsoncpp_sources
                 json_tool.h
-                json_reader.cpp
+                json_legacy_reader.cpp
+                json_char_reader.cpp
                 json_valueiterator.inl
                 json_value.cpp
                 json_writer.cpp
