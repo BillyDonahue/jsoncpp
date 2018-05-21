@@ -43,12 +43,6 @@
 namespace Json {
 namespace Our {
 
-#if __cplusplus >= 201103L || (defined(_CPPLIB_VER) && _CPPLIB_VER >= 520)
-typedef std::unique_ptr<CharReader> CharReaderPtr;
-#else
-typedef std::auto_ptr<CharReader>   CharReaderPtr;
-#endif
-
 // exact copy of Features
 class Features {
 public:
@@ -188,7 +182,7 @@ private:
   Value* lastValue_;
   JSONCPP_STRING commentsBefore_;
 
-  Features const features_;
+  const Features features_;
   bool collectComments_;
 };  // Reader
 
@@ -201,7 +195,7 @@ bool Reader::containsNewLine(Reader::Location begin, Reader::Location end) {
   return false;
 }
 
-Reader::Reader(Features const& features)
+Reader::Reader(const Features& features)
     : errors_(), document_(), begin_(), end_(), current_(), lastValueEnd_(),
       lastValue_(), commentsBefore_(),
       features_(features), collectComments_() {
@@ -1201,8 +1195,8 @@ bool parseFromStream(
   char const* begin = doc.data();
   char const* end = begin + doc.size();
   // Note that we do not actually need a null-terminator.
-  Our::CharReaderPtr const reader(fact.newCharReader());
-  return reader->parse(begin, end, root, errs);
+  Our::CharReader const reader(fact.newCharReader());
+  return reader.parse(begin, end, root, errs);
 }
 
 JSONCPP_ISTREAM& operator>>(JSONCPP_ISTREAM& sin, Value& root) {
