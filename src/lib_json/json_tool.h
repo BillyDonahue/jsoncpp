@@ -16,6 +16,8 @@
 #include <clocale>
 #endif
 
+#include <iostream>
+
 /* This header provides common string manipulation support, such as UTF-8,
  * portable conversion from/to string...
  *
@@ -23,7 +25,7 @@
  */
 
 namespace Json {
-static char getDecimalPoint() {
+static inline char getDecimalPoint() {
 #ifdef JSONCPP_NO_LOCALE_SUPPORT
   return '\0';
 #else
@@ -101,6 +103,12 @@ Iter fixNumericLocale(Iter begin, Iter end) {
 template <typename Iter>
 void fixNumericLocaleInput(Iter begin, Iter end) {
   char decimalPoint = getDecimalPoint();
+  std::cout << "decimalPoint: " << std::hex << int(decimalPoint) << std::endl;
+  if (1) {
+    struct lconv* lc = localeconv();
+    char dec = lc ? *(lc->decimal_point) : '\0';
+    std::cout << "dec: " << std::hex << int(dec) << std::endl;
+  }
   if (decimalPoint == '\0' || decimalPoint == '.') {
     return;
   }

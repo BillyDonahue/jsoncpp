@@ -18,6 +18,7 @@
 #include <sstream>
 #include <string>
 #include <iomanip>
+#include <iostream>
 #include <cmath>
 
 // Make numeric limits more convenient to talk about.
@@ -1836,6 +1837,24 @@ JSONTEST_FIXTURE(ReaderTest, parseWithNoErrors) {
   JSONTEST_ASSERT(reader.getStructuredErrors().size() == 0);
 }
 
+JSONTEST_FIXTURE(ReaderTest, parseWithNoErrorsLocale) {
+  setlocale(LC_NUMERIC, "");
+
+  Json::CharReaderBuilder builder;
+  Json::Value root;
+  JSONCPP_STRING errs;
+  
+  for (int i = 1; i < 40 ; ++i) {
+    std::cout << "i=" << std::dec << i << std::endl;
+    std::string nines(i, '9');
+    std::istringstream iss("{ \"property\" : "+ nines + ",0 }");
+    std::cout << iss.str() << std::endl;
+    bool ok = Json::parseFromStream(builder, iss, &root, &errs);
+    JSONTEST_ASSERT(ok);
+    JSONTEST_ASSERT(errs == "");
+  }
+}
+
 JSONTEST_FIXTURE(ReaderTest, parseWithNoErrorsTestingOffsets) {
   Json::Reader reader;
   Json::Value root;
@@ -2616,6 +2635,7 @@ int main(int argc, const char* argv[]) {
   JSONTEST_REGISTER_FIXTURE(runner, StreamWriterTest, writeZeroes);
 
   JSONTEST_REGISTER_FIXTURE(runner, ReaderTest, parseWithNoErrors);
+  JSONTEST_REGISTER_FIXTURE(runner, ReaderTest, parseWithNoErrorsLocale);
   JSONTEST_REGISTER_FIXTURE(
       runner, ReaderTest, parseWithNoErrorsTestingOffsets);
   JSONTEST_REGISTER_FIXTURE(runner, ReaderTest, parseWithOneError);

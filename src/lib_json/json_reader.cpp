@@ -1641,12 +1641,16 @@ bool OurReader::decodeDouble(Token& token, Value& decoded) {
   char format[] = "%lf";
 
   if (length <= bufferSize) {
+    std::cout << "short token: " << __FUNCTION__ << ":"
+        << std::string(token.start_, token.end_) << std::endl;
     Char buffer[bufferSize + 1];
     memcpy(buffer, token.start_, ulength);
     buffer[length] = 0;
     fixNumericLocaleInput(buffer, buffer + length);
     count = sscanf(buffer, format, &value);
   } else {
+    std::cout << "long token: " << __FUNCTION__ << ":"
+        << std::string(token.start_, token.end_) << std::endl;
     JSONCPP_STRING buffer(token.start_, token.end_);
     count = sscanf(buffer.c_str(), format, &value);
   }
