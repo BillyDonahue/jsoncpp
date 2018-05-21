@@ -6,6 +6,8 @@
 #ifndef LIB_JSONCPP_JSON_TOOL_H_INCLUDED
 #define LIB_JSONCPP_JSON_TOOL_H_INCLUDED
 
+#include <json/config.h>
+
 // Also support old flag NO_LOCALE_SUPPORT
 #ifdef NO_LOCALE_SUPPORT
 #define JSONCPP_NO_LOCALE_SUPPORT
