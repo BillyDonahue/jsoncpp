@@ -1081,6 +1081,7 @@ public:
 
 CharReaderBuilder::CharReaderBuilder() { setDefaults(&settings_); }
 CharReaderBuilder::~CharReaderBuilder() {}
+
 CharReader* CharReaderBuilder::newCharReader() const {
   bool collectComments = settings_["collectComments"].asBool();
   Our::Features features = Our::Features::all();
@@ -1172,8 +1173,10 @@ bool parseFromStream(CharReader::Factory const& fact,
   char const* begin = doc.data();
   char const* end = begin + doc.size();
   // Note that we do not actually need a null-terminator.
-  Our::CharReader const reader(fact.newCharReader());
-  return reader.parse(begin, end, root, errs);
+  Json::CharReader* reader = fact.newCharReader();
+  bool b = reader->parse(begin, end, root, errs);
+  delete reader;
+  return b;
 }
 
 JSONCPP_ISTREAM& operator>>(JSONCPP_ISTREAM& sin, Value& root) {
