@@ -6,7 +6,6 @@
 #ifndef LIB_JSONCPP_JSON_TOOL_H_INCLUDED
 #define LIB_JSONCPP_JSON_TOOL_H_INCLUDED
 
-
 // Also support old flag NO_LOCALE_SUPPORT
 #ifdef NO_LOCALE_SUPPORT
 #define JSONCPP_NO_LOCALE_SUPPORT
@@ -88,8 +87,7 @@ static inline void uintToString(LargestUInt value, char*& current) {
  * We had a sophisticated way, but it did not work in WinCE.
  * @see https://github.com/open-source-parsers/jsoncpp/pull/9
  */
-template <typename Iter>
-Iter fixNumericLocale(Iter begin, Iter end) {
+template <typename Iter> Iter fixNumericLocale(Iter begin, Iter end) {
   for (; begin != end; ++begin) {
     if (*begin == ',') {
       *begin = '.';
@@ -98,8 +96,7 @@ Iter fixNumericLocale(Iter begin, Iter end) {
   return begin;
 }
 
-template <typename Iter>
-void fixNumericLocaleInput(Iter begin, Iter end) {
+template <typename Iter> void fixNumericLocaleInput(Iter begin, Iter end) {
   char decimalPoint = getDecimalPoint();
   if (decimalPoint == '\0' || decimalPoint == '.') {
     return;
@@ -115,14 +112,13 @@ void fixNumericLocaleInput(Iter begin, Iter end) {
  * Return iterator that would be the new end of the range [begin,end), if we
  * were to delete zeros in the end of string, but not the last zero before '.'.
  */
-template <typename Iter>
-Iter fixZerosInTheEnd(Iter begin, Iter end) {
+template <typename Iter> Iter fixZerosInTheEnd(Iter begin, Iter end) {
   for (; begin != end; --end) {
-    if (*(end-1) != '0') {
+    if (*(end - 1) != '0') {
       return end;
     }
     // Don't delete the last zero before the decimal point.
-    if (begin != (end-1) && *(end-2) == '.') {
+    if (begin != (end - 1) && *(end - 2) == '.') {
       return end;
     }
   }
