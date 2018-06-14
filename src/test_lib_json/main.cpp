@@ -2504,7 +2504,7 @@ struct Issues : JsonTest::TestCase {};
 
 JSONTEST_FIXTURE(Issues, issue796) {
   Json::Value root;
-  JSONTEST_ASSERT(Json::Reader().parse(" 8:", root));
+  JSONTEST_ASSERT(!Json::Reader().parse(" 8:", root));
   JSONTEST_ASSERT_THROWS(root["cmd"]);
 }
 
