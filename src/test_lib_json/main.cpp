@@ -14,6 +14,7 @@
 #include <cmath>
 #include <cstring>
 #include <iomanip>
+#include <iostream>
 #include <json/config.h>
 #include <json/json.h>
 #include <limits>
@@ -2499,6 +2500,14 @@ JSONTEST_FIXTURE(RValueTest, moveConstruction) {
 #endif
 }
 
+struct Issues : JsonTest::TestCase {};
+
+JSONTEST_FIXTURE(Issues, issue796) {
+  Json::Value root;
+  JSONTEST_ASSERT(Json::Reader().parse(" 8:", root));
+  JSONTEST_ASSERT_THROWS(root["cmd"]);
+}
+
 int main(int argc, const char* argv[]) {
   JsonTest::Runner runner;
   JSONTEST_REGISTER_FIXTURE(runner, ValueTest, checkNormalizeFloatingPointStr);
@@ -2577,6 +2586,8 @@ int main(int argc, const char* argv[]) {
   JSONTEST_REGISTER_FIXTURE(runner, IteratorTest, const);
 
   JSONTEST_REGISTER_FIXTURE(runner, RValueTest, moveConstruction);
+
+  JSONTEST_REGISTER_FIXTURE(runner, Issues, issue796);
 
   return runner.runCommandLine(argc, argv);
 }
