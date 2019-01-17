@@ -5,7 +5,6 @@
 
 #ifndef JSON_CONFIG_H_INCLUDED
 #define JSON_CONFIG_H_INCLUDED
-
 #include <cstddef>
 #include <cstdint>
 #include <string>
@@ -150,7 +149,6 @@ msvc_pre1900_c99_snprintf(char* outBuf, size_t size, const char* format, ...);
 #endif // if !defined(JSON_IS_AMALGAMATION)
 
 namespace Json {
-
 using Int = int;
 using UInt = unsigned int;
 
@@ -181,9 +179,9 @@ using OStringStream = std::basic_ostringstream<String::value_type,
                                                String::allocator_type>;
 using IStream = std::istream;
 using OStream = std::ostream;
-
 } // namespace Json
 
+// Legacy names.
 using JSONCPP_STRING = Json::String;
 using JSONCPP_ISTRINGSTREAM = Json::IStringStream;
 using JSONCPP_OSTRINGSTREAM = Json::OStringStream;
