@@ -5,9 +5,11 @@
 
 #ifndef JSON_CONFIG_H_INCLUDED
 #define JSON_CONFIG_H_INCLUDED
+
 #include <cstddef>
-#include <cstdint> //typedef int64_t, uint64_t
-#include <string>  //typedef String
+#include <cstdint>
+#include <string>
+#include <type_traits>
 
 /// If defined, indicates that json library is embedded in CppTL library.
 //# define JSON_IN_CPPTL 1
@@ -142,52 +144,50 @@ msvc_pre1900_c99_snprintf(char* outBuf, size_t size, const char* format, ...);
 
 #if !defined(JSON_IS_AMALGAMATION)
 
+#include "allocator.h"
 #include "version.h"
-
-#if JSONCPP_USING_SECURE_MEMORY
-#include "allocator.h" //typedef Allocator
-#endif
 
 #endif // if !defined(JSON_IS_AMALGAMATION)
 
 namespace Json {
-typedef int Int;
-typedef unsigned int UInt;
+
+using Int = int;
+using UInt = unsigned int;
+
 #if defined(JSON_NO_INT64)
-typedef int LargestInt;
-typedef unsigned int LargestUInt;
+using LargestInt = int;
+using LargestUInt = unsigned int;
 #undef JSON_HAS_INT64
-#else                 // if defined(JSON_NO_INT64)
-// For Microsoft Visual use specific types as long long is not supported
-#if defined(_MSC_VER) // Microsoft Visual Studio
-typedef __int64 Int64;
-typedef unsigned __int64 UInt64;
-#else                 // if defined(_MSC_VER) // Other platforms, use long long
-typedef int64_t Int64;
-typedef uint64_t UInt64;
-#endif                // if defined(_MSC_VER)
-typedef Int64 LargestInt;
-typedef UInt64 LargestUInt;
+#else // JSON_NO_INT64
+// The int64_t typedef is optional.
+using Int64 = int64_t;
+using UInt64 = uint64_t;
+using LargestInt = Int64;
+using LargestUInt = UInt64;
 #define JSON_HAS_INT64
-#endif // if defined(JSON_NO_INT64)
-#if JSONCPP_USING_SECURE_MEMORY
-#define JSONCPP_STRING                                                         \
-  std::basic_string<char, std::char_traits<char>, Json::SecureAllocator<char> >
-#define JSONCPP_OSTRINGSTREAM                                                  \
-  std::basic_ostringstream<char, std::char_traits<char>,                       \
-                           Json::SecureAllocator<char> >
-#define JSONCPP_OSTREAM std::basic_ostream<char, std::char_traits<char> >
-#define JSONCPP_ISTRINGSTREAM                                                  \
-  std::basic_istringstream<char, std::char_traits<char>,                       \
-                           Json::SecureAllocator<char> >
-#define JSONCPP_ISTREAM std::istream
-#else
-#define JSONCPP_STRING std::string
-#define JSONCPP_OSTRINGSTREAM std::ostringstream
-#define JSONCPP_OSTREAM std::ostream
-#define JSONCPP_ISTRINGSTREAM std::istringstream
-#define JSONCPP_ISTREAM std::istream
-#endif // if JSONCPP_USING_SECURE_MEMORY
-} // end namespace Json
+#endif // JSON_NO_INT64
+
+template <typename T>
+using Allocator = typename std::conditional<JSONCPP_USING_SECURE_MEMORY,
+                                            SecureAllocator<T>,
+                                            std::allocator<T> >::type;
+using String =
+    std::basic_string<char, std::char_traits<char>, Allocator<char> >;
+using IStringStream = std::basic_istringstream<String::value_type,
+                                               String::traits_type,
+                                               String::allocator_type>;
+using OStringStream = std::basic_ostringstream<String::value_type,
+                                               String::traits_type,
+                                               String::allocator_type>;
+using IStream = std::istream;
+using OStream = std::ostream;
+
+} // namespace Json
+
+using JSONCPP_STRING = Json::String;
+using JSONCPP_ISTRINGSTREAM = Json::IStringStream;
+using JSONCPP_OSTRINGSTREAM = Json::OStringStream;
+using JSONCPP_ISTREAM = Json::IStream;
+using JSONCPP_OSTREAM = Json::OStream;
 
 #endif // JSON_CONFIG_H_INCLUDED
