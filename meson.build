@@ -80,6 +80,7 @@ jsoncpp_test = executable(
     'src/test_lib_json/fuzz.cpp'],
   include_directories : jsoncpp_include_directories,
   link_with : jsoncpp_lib,
+  link_args: '-lpthread',
   install : false,
   cpp_args: dll_import_flag)
 test(

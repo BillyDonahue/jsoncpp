@@ -23,6 +23,7 @@
 #include <limits>
 #include <sstream>
 #include <string>
+#include <thread>
 
 using CharReaderPtr = std::unique_ptr<Json::CharReader>;
 
@@ -3694,6 +3695,11 @@ JSONTEST_FIXTURE_LOCAL(FuzzTest, fuzzDoesntCrash) {
 }
 
 int main(int argc, const char* argv[]) {
+  std::thread([] {
+    auto v = Json::Value::null;
+    (void)v;
+  }).join();
+
   JsonTest::Runner runner;
 
   for (auto it = local_.begin(); it != local_.end(); it++) {
