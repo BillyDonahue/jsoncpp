@@ -278,12 +278,11 @@ public:
  *
  * Usage:
  *   \code
- *   using namespace Json;
- *   CharReaderBuilder builder;
+ *   Json::CharReaderBuilder builder;
  *   builder["collectComments"] = false;
- *   Value value;
- *   String errs;
- *   bool ok = parseFromStream(builder, std::cin, &value, &errs);
+ *   Json::Value value;
+ *   Json::String errs;
+ *   bool ok = Json::parseFromStream(builder, std::cin, &value, &errs);
  *   \endcode
  */
 class JSON_API CharReaderBuilder : public CharReader::Factory {

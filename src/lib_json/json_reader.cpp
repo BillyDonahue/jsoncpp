@@ -11,6 +11,7 @@
 #include <json/value.h>
 #endif // if !defined(JSON_IS_AMALGAMATION)
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <cstring>
 #include <iostream>
@@ -57,6 +58,16 @@ using CharReaderPtr = std::unique_ptr<CharReader>;
 #else
 using CharReaderPtr = std::auto_ptr<CharReader>;
 #endif
+
+static unsigned decodeHexDigit(unsigned char c) {
+    if (c >= '0' && c <= '9')
+      return c - '0';
+    if (c >= 'a' && c <= 'f')
+      return c - 'a' + 10;
+    if (c >= 'A' && c <= 'F')
+      return c - 'A' + 10;
+    return -1u;
+}
 
 // Implementation of class Features
 // ////////////////////////////////
@@ -602,8 +613,11 @@ bool Reader::decodeDouble(Token& token, Value& decoded) {
   String buffer(token.start_, token.end_);
   IStringStream is(buffer);
   if (!(is >> value))
-    return addError(
-        "'" + String(token.start_, token.end_) + "' is not a number.", token);
+    return addError(String()
+                        .append("'")
+                        .append(token.start_, token.end_ - token.start_)
+                        .append("' is not a number."),
+                    token);
   decoded = value;
   return true;
 }
@@ -704,22 +718,16 @@ bool Reader::decodeUnicodeEscapeSequence(Token& token, Location& current,
     return addError(
         "Bad unicode escape sequence in string: four digits expected.", token,
         current);
-  int unicode = 0;
+  ret_unicode = 0;
   for (int index = 0; index < 4; ++index) {
     Char c = *current++;
-    unicode *= 16;
-    if (c >= '0' && c <= '9')
-      unicode += c - '0';
-    else if (c >= 'a' && c <= 'f')
-      unicode += c - 'a' + 10;
-    else if (c >= 'A' && c <= 'F')
-      unicode += c - 'A' + 10;
-    else
+    unsigned hexOrd = decodeHexDigit(c);
+    if (hexOrd == -1u)
       return addError(
           "Bad unicode escape sequence in string: hexadecimal digit expected.",
           token, current);
+    ret_unicode = (ret_unicode << 4) | hexOrd;
   }
-  ret_unicode = static_cast<unsigned int>(unicode);
   return true;
 }
 
@@ -1648,8 +1656,11 @@ bool OurReader::decodeDouble(Token& token, Value& decoded) {
   const String buffer(token.start_, token.end_);
   IStringStream is(buffer);
   if (!(is >> value)) {
-    return addError(
-        "'" + String(token.start_, token.end_) + "' is not a number.", token);
+    return addError(String()
+                        .append("'")
+                        .append(token.start_, token.end_ - token.start_)
+                        .append("' is not a number."),
+                    token);
   }
   decoded = value;
   return true;
@@ -1751,22 +1762,16 @@ bool OurReader::decodeUnicodeEscapeSequence(Token& token, Location& current,
     return addError(
         "Bad unicode escape sequence in string: four digits expected.", token,
         current);
-  int unicode = 0;
+  ret_unicode = 0;
   for (int index = 0; index < 4; ++index) {
     Char c = *current++;
-    unicode *= 16;
-    if (c >= '0' && c <= '9')
-      unicode += c - '0';
-    else if (c >= 'a' && c <= 'f')
-      unicode += c - 'a' + 10;
-    else if (c >= 'A' && c <= 'F')
-      unicode += c - 'A' + 10;
-    else
+    unsigned hexOrd = decodeHexDigit(c);
+    if (hexOrd == -1u)
       return addError(
           "Bad unicode escape sequence in string: hexadecimal digit expected.",
           token, current);
+    ret_unicode = (ret_unicode << 4) | hexOrd;
   }
-  ret_unicode = static_cast<unsigned int>(unicode);
   return true;
 }
 

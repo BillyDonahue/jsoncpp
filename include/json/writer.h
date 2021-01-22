@@ -27,16 +27,14 @@ namespace Json {
 class Value;
 
 /**
- *
  * Usage:
- *  \code
- *  using namespace Json;
- *  void writeToStdout(StreamWriter::Factory const& factory, Value const& value)
- * { std::unique_ptr<StreamWriter> const writer( factory.newStreamWriter());
- *    writer->write(value, &std::cout);
- *    std::cout << std::endl;  // add lf and flush
- *  }
- *  \endcode
+ *   \code
+ *   void writeToStdout(Json::StreamWriter::Factory const& factory, Json::Value const& value) {
+ *     std::unique_ptr<Json::StreamWriter> const writer(factory.newStreamWriter());
+ *     writer->write(value, &std::cout);
+ *     std::cout << std::endl;
+ *   }
+ *   \endcode
  */
 class JSON_API StreamWriter {
 protected:
@@ -72,20 +70,17 @@ String JSON_API writeString(StreamWriter::Factory const& factory,
                             Value const& root);
 
 /** \brief Build a StreamWriter implementation.
-
-* Usage:
-*   \code
-*   using namespace Json;
-*   Value value = ...;
-*   StreamWriterBuilder builder;
-*   builder["commentStyle"] = "None";
-*   builder["indentation"] = "   ";  // or whatever you like
-*   std::unique_ptr<Json::StreamWriter> writer(
-*      builder.newStreamWriter());
-*   writer->write(value, &std::cout);
-*   std::cout << std::endl;  // add lf and flush
-*   \endcode
-*/
+ * Usage:
+ *   \code
+ *   Json::Value value = ...;
+ *   Json::StreamWriterBuilder builder;
+ *   builder["commentStyle"] = "None";
+ *   builder["indentation"] = "   ";  // or whatever you like
+ *   std::unique_ptr<Json::StreamWriter> writer(builder.newStreamWriter());
+ *   writer->write(value, &std::cout);
+ *   std::cout << std::endl;
+ *   \endcode
+ */
 class JSON_API StreamWriterBuilder : public StreamWriter::Factory {
 public:
   // Note: We use a Json::Value so that we can add data-members to this class

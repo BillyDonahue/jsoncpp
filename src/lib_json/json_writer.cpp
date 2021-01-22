@@ -130,10 +130,10 @@ String valueToString(double value, bool useSpecialFloats,
   // that always has a decimal point because JSON doesn't distinguish the
   // concepts of reals and integers.
   if (!isfinite(value)) {
-    static const char* const reps[2][3] = {{"NaN", "-Infinity", "Infinity"},
-                                           {"null", "-1e+9999", "1e+9999"}};
-    return reps[useSpecialFloats ? 0 : 1]
-               [isnan(value) ? 0 : (value < 0) ? 1 : 2];
+    static const char* const styles[2][3] = {{"null", "-1e+9999", "1e+9999"},
+                                             {"NaN", "-Infinity", "Infinity"}};
+    const char* const(&reps)[3] = styles[useSpecialFloats];
+    return reps[isnan(value) ? 0 : (value < 0) ? 1 : 2];
   }
 
   String buffer(size_t(36), '\0');
@@ -236,49 +236,26 @@ static unsigned int utf8ToCodepoint(const char*& s, const char* e) {
   return REPLACEMENT_CHARACTER;
 }
 
-static const char hex2[] = "000102030405060708090a0b0c0d0e0f"
-                           "101112131415161718191a1b1c1d1e1f"
-                           "202122232425262728292a2b2c2d2e2f"
-                           "303132333435363738393a3b3c3d3e3f"
-                           "404142434445464748494a4b4c4d4e4f"
-                           "505152535455565758595a5b5c5d5e5f"
-                           "606162636465666768696a6b6c6d6e6f"
-                           "707172737475767778797a7b7c7d7e7f"
-                           "808182838485868788898a8b8c8d8e8f"
-                           "909192939495969798999a9b9c9d9e9f"
-                           "a0a1a2a3a4a5a6a7a8a9aaabacadaeaf"
-                           "b0b1b2b3b4b5b6b7b8b9babbbcbdbebf"
-                           "c0c1c2c3c4c5c6c7c8c9cacbcccdcecf"
-                           "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf"
-                           "e0e1e2e3e4e5e6e7e8e9eaebecedeeef"
-                           "f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff";
-
-static String toHex16Bit(unsigned int x) {
-  const unsigned int hi = (x >> 8) & 0xff;
-  const unsigned int lo = x & 0xff;
-  String result(4, ' ');
-  result[0] = hex2[2 * hi];
-  result[1] = hex2[2 * hi + 1];
-  result[2] = hex2[2 * lo];
-  result[3] = hex2[2 * lo + 1];
-  return result;
-}
-
 static void appendRaw(String& result, unsigned ch) {
   result += static_cast<char>(ch);
 }
 
 static void appendHex(String& result, unsigned ch) {
-  result.append("\\u").append(toHex16Bit(ch));
+  static const char h[] = "0123456789abcdef";
+  result.append({{'\\', 'u', h[(ch >> 12) & 0xf], h[(ch >> 8) & 0xf],
+                  h[(ch >> 4) & 0xf], h[(ch >> 0) & 0xf]}});
 }
 
 static String valueToQuotedStringN(const char* value, size_t length,
                                    bool emitUTF8 = false) {
   if (value == nullptr)
-    return "";
+    return {};
 
-  if (!doesAnyCharRequireEscaping(value, length))
-    return String("\"") + value + "\"";
+  if (!doesAnyCharRequireEscaping(value, length)) {
+    String s{};
+    s.reserve(length + 2);
+    return s.append({'"'}).append(value).append({'"'});
+  }
   // We have to walk value and escape any special characters.
   // Appending to String is not efficient, but this should be rare.
   // (Note: forward slashes are *not* rare, but I am not escaping them.)
@@ -627,9 +604,10 @@ void StyledWriter::writeCommentBeforeValue(const Value& root) {
 }
 
 void StyledWriter::writeCommentAfterValueOnSameLine(const Value& root) {
-  if (root.hasComment(commentAfterOnSameLine))
-    document_ += " " + root.getComment(commentAfterOnSameLine);
-
+  if (root.hasComment(commentAfterOnSameLine)) {
+    document_ += " ";
+    document_ += root.getComment(commentAfterOnSameLine);
+  }
   if (root.hasComment(commentAfter)) {
     document_ += '\n';
     document_ += root.getComment(commentAfter);
