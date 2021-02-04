@@ -12,6 +12,7 @@
 
 #include "fuzz.h"
 #include "jsontest.h"
+#include <algorithm>
 #include <cmath>
 #include <cstring>
 #include <functional>
@@ -24,6 +25,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <vector>
 
 using CharReaderPtr = std::unique_ptr<Json::CharReader>;
 
@@ -3865,6 +3867,30 @@ JSONTEST_FIXTURE_LOCAL(IteratorTest, constness) {
   Json::String expected = R"(" 9","10","11",)";
   JSONTEST_ASSERT_STRING_EQUAL(expected, out.str());
 }
+
+#if 0
+JSONTEST_FIXTURE_LOCAL(IteratorTest, transform_issue1253) {
+    auto in = Json::Value(Json::arrayValue);
+    in.append(123);
+    in.append(456);
+    in.append("hi");
+    Json::Value result;
+    result.resize(in.size());
+    std::transform(in.begin(), in.end(), result.begin(), [](const Json::Value& val){
+        // return static_cast<bool>(val);
+        return Json::Value(static_cast<bool>(val));
+    });
+}
+#endif
+
+JSONTEST_FIXTURE_LOCAL(IteratorTest, transform_issue1253_minimal) {
+    Json::Value result;
+    int n = 10;
+    result.resize(n);
+    JSONTEST_ASSERT_EQUAL(n, result.size());
+    JSONTEST_ASSERT_EQUAL(n, std::distance(result.begin(), result.end()));
+}
+
 
 struct RValueTest : JsonTest::TestCase {};
 
